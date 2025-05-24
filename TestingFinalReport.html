@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .report-output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .download-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            width: 100%;
+            margin-top: 15px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .download-btn:hover {
+            background-color: #218838;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            color: #007bff;
+        }
+        .section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .section ul li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Generated Report</h2>
+    <button onclick="fetchReport()">Generate Report</button>
+    <div id="report-output" class="report-output"></div>
+    <button class="download-btn" id="download" style="display: none;">Download JSON</button>
+</div>
+
+<script>
+    const orderedSections = [
+        "Introduction & Purpose",
+        "Message from Hedamo’s Leadership",
+        "Executive Summary",
+        "Product Identity & Classification",
+        "Sourcing & Farming Practices",
+        "Processing & Manufacturing Transparency",
+        "Ingredient & Composition Analysis",
+        "Sustainability & Environmental Impact",
+        "Ethical & Social Responsibility",
+        "Market Presence & Commercial Viability",
+        "Lab Testing & Compliance Reports",
+        "QR Code & Digital Transparency",
+        "Final Scorecard & Hedamo Transparency Label",
+        "Scoring System",
+        "Conclusion"
+    ];
+
+    const orderedSections1 = [
+       "report",
+       "summary",
+       "documentInstructions"
+    ];
+
+    const orderedSections2 = [
+       "response"
+    ];
+
+    const orderedSections3=[
+        ""
+    ]
+
+
+    async function fetchReport() {
+        let payload = {
+            "file_data": [
+                {
+                    "q": "what do you produce",
+                    "t": "text",
+                    "a": "we produce wheat."
+                },
+                {
+                    "q":"Company Name and brand.",
+                    "t":"text",
+                    "a":"We are Emmar Wheat group."
+                }
+            ],
+            "metadata": [
+                { "language": "English" },
+                { "Specific_constraint": "Generate good Report" },
+                { "Key": "abhishek123" },
+                { "category": "food" }
+            ]
+        };
+
+        try {
+            let response = await fetch("http://127.0.0.1:5000/generate_final_report", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            let outputDiv = document.getElementById("report-output");
+            let downloadBtn = document.getElementById("download");
+
+            if (!response.ok) {
+                let errorMsg = await response.json();
+                outputDiv.innerHTML = `<p style="color:red;">Error: ${errorMsg.error}</p>`;
+                downloadBtn.style.display = "none";
+                return;
+            }
+
+            let result = await response.json();
+            let formattedReport = generateReportHTML(result);
+            outputDiv.innerHTML = formattedReport;
+
+            window.generatedReport = JSON.stringify(result, null, 2);
+            downloadBtn.style.display = "block";
+        } catch (error) {
+            console.error("❌ Error:", error);
+            document.getElementById("report-output").innerHTML = `<p style="color:red;">Internal Server Error.</p>`;
+        }
+    }
+
+    function generateReportHTML(data) {
+        let html = "";
+
+        for (let section of orderedSections) {
+            if (data[section]) {
+                html += `<div class="section"><h3>${section}</h3>`;
+                if (typeof data[section] === 'object' && !Array.isArray(data[section])) {
+                    html += `<ul>${generateNestedHTML(data[section])}</ul>`;
+                } else {
+                    html += `<p>${data[section]}</p>`;
+                }
+                html += `</div>`;
+            }
+        }
+
+        return html;
+    }
+
+    function generateNestedHTML(obj) {
+        let nestedHTML = "";
+
+        for (let key in obj) {
+            if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+                nestedHTML += `<li><strong>${key}:</strong><ul>${generateNestedHTML(obj[key])}</ul></li>`;
+            } else if (Array.isArray(obj[key])) {
+                nestedHTML += `<li><strong>${key}:</strong> ${obj[key].join(", ")}</li>`;
+            } else {
+                nestedHTML += `<li><strong>${key}:</strong> ${obj[key]}</li>`;
+            }
+        }
+
+        return nestedHTML;
+    }
+</script>
+
+
+</body>
+</html>
