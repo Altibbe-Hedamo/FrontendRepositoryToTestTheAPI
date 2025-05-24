@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Questionnaire</title>
+  <style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #e0f7fa, #a5d6a7);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  transition: background 0.3s ease;
+}
+
+.main-wrapper {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  flex-wrap: wrap;
+  animation: fadeInWrapper 1s ease-in-out;
+}
+
+@keyframes fadeInWrapper {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#answered-questions-panel {
+  flex: 1;
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 24px rgba(0, 128, 128, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+#answered-questions-panel:hover {
+  transform: translateY(-3px);
+}
+
+#answered-questions-panel h3 {
+  margin-bottom: 10px;
+  text-align: center;
+  color: #00796b;
+  font-weight: bold;
+}
+
+#answered-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.answered-question {
+  background-color: #e8f5e9;
+  border-left: 4px solid #00796b;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.95em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.answered-question:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 121, 107, 0.15);
+}
+
+.chat-panel {
+  flex: 2;
+  width: 100%;
+}
+
+.container {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 30px 20px;
+  box-shadow: 0 6px 24px rgba(0, 128, 128, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+input[type="text"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 1em;
+  border: 1px solid #80cbc4;
+  border-radius: 8px;
+  background-color: #f1f8e9;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #00796b;
+  box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.2);
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #004d40;
+  transition: color 0.2s;
+}
+
+button {
+  background-color: #00796b;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #004d40;
+  transform: scale(1.04);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #00796b;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 10px;
+}
+
+.spinner-text {
+  font-size: 0.95em;
+  color: #555;
+}
+
+.multi-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sub-category-chip {
+  background-color: #e0f2f1;
+  border: 1px solid #80cbc4;
+  border-radius: 16px;
+  padding: 5px 12px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.sub-category-chip:hover {
+  background-color: #b2dfdb;
+  transform: scale(1.05);
+}
+
+.sub-category-chip.selected {
+  background-color: #00796b;
+  color: white;
+  border-color: #004d40;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+pre {
+  background: #e0f2f1;
+  padding: 15px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .main-wrapper {
+    flex-direction: column;
+  }
+
+  #answered-questions-panel,
+  .chat-panel {
+    width: 100%;
+  }
+
+#response {
+  height: 50px;
+  font-size: 1.1em;
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+#file-input {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#submit-btn,
+#start-recording {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 1.1em;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#submit-btn:hover,
+#start-recording:hover {
+  background-color: #0056b3;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="main-wrapper">
+
+  <div id="answered-questions-panel">
+    <h3>Answered Questions</h3>
+    <div id="answered-questions"></div>
+  </div>
+
+  <div class="chat-panel">
+    <div id="setup-form" class="container">
+      <h1>Ground Questionnaire Setup</h1>
+      <p>Please provide the initial information to start the questionnaire.</p>
+      
+      <div class="form-group">
+        <label for="category">Category:</label>
+        <select id="category">
+          <option value="">Select a category</option>
+          <option value="food">Food</option>
+          <option value="clothing">Clothing</option>
+          <option value="cosmetics">Cosmetics</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label>Sub-Categories (select multiple):</label>
+        <div class="multi-select" id="sub-categories-container">
+          <div class="sub-category-chip" data-value="Regenerative">Regenerative</div>
+          <div class="sub-category-chip" data-value="General">General</div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="report">Report Text:</label>
+        <textarea id="report" placeholder="Enter your report text here..."></textarea>
+      </div>
+      
+      <button id="start-questionnaire">Start Questionnaire</button>
+    </div>
+
+    <div id="chat-box" class="container hidden">
+      <h1>Ground Questionnaire</h1>
+      <p id="question-text">Loading question...</p>
+
+      <div class="spinner-container" id="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+        <p class="spinner-text" id="spinner-text">Validating...</p>
+      </div>
+
+      <form id="qa-form" onsubmit="event.preventDefault(); submitResponse();">
+        <div class="form-group">
+          <input type="text" id="response" placeholder="Type your answer..." />
+        </div>
+        <div class="form-group">
+          <input type="file" id="file-input" />
+        </div>
+        <div class="form-group">
+          <button type="submit" id="submit-btn">Submit</button>
+        </div>
+      </form>
+
+      <button id="start-recording">Start/Stop Recording</button>
+      <p id="recording-status"></p>
+    </div>
+
+    <div id="result" class="container hidden">
+      <h3>Thank you for your responses!</h3>
+      <ul id="answer-list"></ul>
+      <div id="report-container"></div>
+      <button onclick="restart()">Start Over</button>
+    </div>
+  </div>
+</div>
+
+ <script>
+  const sessionId = Math.random().toString(36).substr(2, 9);
+  let mediaRecorder;
+  let audioChunks = [];
+  let currentQuestion = "";
+  let lastUserResponse = null;
+  let selectedSubCategories = [];
+
+  window.onload = () => {
+    const storedReport = localStorage.getItem("summaryReport");
+    const storedAnswers = JSON.parse(localStorage.getItem("summaryAnswers") || "[]");
+
+    if (storedReport && storedAnswers.length > 0) {
+      showFinalResults(storedAnswers, storedReport);
+      return;
+    }
+
+    const subCategoryChips = document.querySelectorAll('.sub-category-chip');
+    subCategoryChips.forEach(chip => {
+      chip.addEventListener('click', function() {
+        this.classList.toggle('selected');
+        const value = this.getAttribute('data-value');
+        
+        if (this.classList.contains('selected')) {
+          if (!selectedSubCategories.includes(value)) {
+            selectedSubCategories.push(value);
+          }
+        } else {
+          selectedSubCategories = selectedSubCategories.filter(item => item !== value);
+        }
+      });
+    });
+
+    document.getElementById('start-questionnaire').addEventListener('click', startQuestionnaire);
+  };
+
+  function startQuestionnaire() {
+    const category = document.getElementById('category').value;
+    const report = document.getElementById('report').value.trim();
+    
+    if (!category) {
+      alert('Please select a category');
+      return;
+    }
+    
+    if (selectedSubCategories.length === 0) {
+      alert('Please select at least one sub-category');
+      return;
+    }
+    
+    if (!report) {
+      alert('Please enter a report text');
+      return;
+    }
+    
+    document.getElementById('setup-form').classList.add('hidden');
+    document.getElementById('chat-box').classList.remove('hidden');
+    
+    fetchFirstQuestion(category, selectedSubCategories, report);
+  }
+
+  function fetchFirstQuestion(category, subCategories, report) {
+    const spinner = document.getElementById("loading-spinner");
+    spinner.style.display = "flex";
+    document.getElementById("spinner-text").textContent = "Generating first question...";
+
+    const payload = { 
+      session_id: sessionId,
+      report: report,
+      category: category,
+      sub_categories: subCategories
+    };
+
+    fetch("https://groundchatsystem-41kq.onrender.com/chats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+      spinner.style.display = "none";
+      
+      if (data.message) {
+        currentQuestion = data.message;
+        document.getElementById("question-text").innerText = data.message;
+      } else {
+        alert("Error: Failed to retrieve the first question.");
+      }
+    })
+    .catch(err => {
+      spinner.style.display = "none";
+      console.error("Error:", err);
+      alert("Failed to connect to the server. Make sure the backend is running.");
+    });
+  }
+
+  document.getElementById("start-recording").addEventListener("click", async () => {
+    const status = document.getElementById("recording-status");
+
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+          if (event.data.size > 0) audioChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          if (audioChunks.length === 0) {
+            alert("No audio recorded.");
+            return;
+          }
+
+          const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+          const file = new File([audioBlob], "voice_input.wav", { type: "audio/wav" });
+
+          status.textContent = "Uploading voice...";
+
+          const formData = new FormData();
+          formData.append("session_id", sessionId);
+          formData.append("file", file);
+
+          lastUserResponse = "[Voice Uploaded]"; 
+          fetchNextQuestion(null, formData);
+
+          status.textContent = "";
+        };
+
+        mediaRecorder.start();
+        status.textContent = "Recording... Click again to stop.";
+      } catch (err) {
+        console.error("Error accessing microphone:", err);
+        alert("Microphone access denied or unavailable.");
+      }
+    } else if (mediaRecorder.state === "recording") {
+      mediaRecorder.stop();
+    }
+  });
+
+  function fetchNextQuestion(user_response = null, formData = null) {
+    const questionEl = document.getElementById("question-text");
+    const spinner = document.getElementById("loading-spinner");
+    const spinnerText = document.getElementById("spinner-text");
+
+    questionEl.classList.add("fade-out");
+    spinner.style.display = "flex";
+    spinnerText.textContent = "Validating...";
+
+    setTimeout(() => {
+      spinnerText.textContent = "Generating next question...";
+    }, 750);
+
+    setTimeout(() => {
+      let fetchOptions;
+
+      if (formData || user_response) {
+        fetchOptions = {
+          method: "POST",
+          body: formData || createFormData(user_response)
+        };
+      } else {
+        alert("Error: No response provided");
+        spinner.style.display = "none";
+        return;
+      }
+
+      fetch("https://groundchatsystem-41kq.onrender.com/chats", fetchOptions)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("response").value = "";
+          document.getElementById("file-input").value = "";
+
+          spinner.style.display = "none";
+
+          if (data.completed) {
+            document.getElementById("chat-box").style.display = "none";
+            document.getElementById("result").style.display = "flex";
+
+            const list = document.getElementById("answer-list");
+            list.innerHTML = "";
+            data.answers.forEach((ans, idx) => {
+              const li = document.createElement("li");
+              li.innerText = `Q${idx + 1}: ${ans}`;
+              list.appendChild(li);
+            });
+
+            const reportSection = document.createElement("pre");
+            reportSection.innerText = data.report;
+            document.getElementById("report-container").innerHTML = "";
+            document.getElementById("report-container").appendChild(reportSection);
+
+            localStorage.setItem("summaryReport", data.report);
+            localStorage.setItem("summaryAnswers", JSON.stringify(data.answers));
+          } else if (data.message) {
+            const previousQuestion = currentQuestion;
+            currentQuestion = data.message;
+
+            if (lastUserResponse && previousQuestion) { 
+              updateAnsweredQuestions(previousQuestion, lastUserResponse);
+              lastUserResponse = null;
+            }
+
+            questionEl.innerText = data.message;
+            questionEl.classList.remove("fade-out");
+            questionEl.classList.add("fade-in");
+
+            setTimeout(() => {
+              questionEl.classList.remove("fade-in");
+            }, 500);
+          }
+        })
+        .catch(err => {
+          spinner.style.display = "none";
+          console.error("Error:", err);
+          alert("Failed to connect to the server. Make sure the backend is running.");
+        });
+    }, 1500); 
+  }
+
+  function submitResponse() {
+    const text = document.getElementById("response").value.trim();
+    const fileInput = document.getElementById("file-input");
+    const file = fileInput.files[0];
+
+    if (!text && !file) {
+      alert("Please enter a response or upload a file.");
+      return;
+    }
+
+    lastUserResponse = text || "[File Uploaded]"; 
+    const formData = createFormData(text, file);
+    fetchNextQuestion(null, formData);
+  }
+
+  function createFormData(user_response = "", file = null) {
+    const formData = new FormData();
+    formData.append("session_id", sessionId);
+    if (user_response) formData.append("user_response", user_response);
+    if (file) formData.append("file", file);
+
+    return formData;
+  }
+
+  function updateAnsweredQuestions(question, response) {
+    const answeredDiv = document.getElementById("answered-questions");
+    const div = document.createElement("div");
+    div.classList.add("answered-question");
+    div.innerHTML = `<strong>${question}</strong><br/>Answer: ${response}`;
+    answeredDiv.appendChild(div);
+  }
+
+  function restart() {
+    localStorage.clear();
+    window.location.reload();
+  }
+
+  function showFinalResults(answers, report) {
+    document.getElementById("setup-form").style.display = "none";
+    document.getElementById("chat-box").style.display = "none";
+    document.getElementById("result").style.display = "flex";
+
+    const list = document.getElementById("answer-list");
+    list.innerHTML = "";
+    answers.forEach((ans, idx) => {
+      const li = document.createElement("li");
+      li.innerText = `Q${idx + 1}: ${ans}`;
+      list.appendChild(li);
+    });
+
+    const reportSection = document.createElement("pre");
+    reportSection.innerText = report;
+    document.getElementById("report-container").innerHTML = "";
+    document.getElementById("report-container").appendChild(reportSection);
+  }
+</script>
+
+</body>
+</html>
