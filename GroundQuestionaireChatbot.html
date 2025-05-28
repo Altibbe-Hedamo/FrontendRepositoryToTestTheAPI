@@ -285,6 +285,11 @@ pre {
     <div id="setup-form" class="container">
       <h1>Ground Questionnaire Setup</h1>
       <p>Please provide the initial information to start the questionnaire.</p>
+
+      <div class="form-group">
+      <label for="product-name">Product Name:</label>
+      <input type="text" id="product-name" placeholder="Enter product name..." />
+      </div>
       
       <div class="form-group">
         <label for="category">Category:</label>
@@ -303,6 +308,7 @@ pre {
           <div class="sub-category-chip" data-value="General">General</div>
         </div>
       </div>
+
       
       <div class="form-group">
         <label for="report">Report Text:</label>
@@ -353,6 +359,7 @@ pre {
   let currentQuestion = "";
   let lastUserResponse = null;
   let selectedSubCategories = [];
+  let productName="";
 
   window.onload = () => {
     const storedReport = localStorage.getItem("summaryReport");
@@ -385,6 +392,7 @@ pre {
   function startQuestionnaire() {
     const category = document.getElementById('category').value;
     const report = document.getElementById('report').value.trim();
+    productName=document.getElementById('product-name').value
     
     if (!category) {
       alert('Please select a category');
@@ -399,6 +407,11 @@ pre {
     if (!report) {
       alert('Please enter a report text');
       return;
+    }
+
+    if(!productName)
+    {
+      alert('Please enter product name')
     }
     
     document.getElementById('setup-form').classList.add('hidden');
@@ -416,7 +429,8 @@ pre {
       session_id: sessionId,
       report: report,
       category: category,
-      sub_categories: subCategories
+      sub_categories: subCategories,
+      product_name:productName
     };
 
     fetch("https://groundchatsystem-41kq.onrender.com/chats", {
