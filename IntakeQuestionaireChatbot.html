@@ -183,6 +183,11 @@
         <option value="">Select a subcategory</option>
       </select>
     </div>
+
+    <div class="category-selection">
+    <label for="product_name">Product Name:</label>
+    <input type="text" id="product_name" placeholder="Enter product name" />
+    </div>
     
     <button id="start-questionnaire">Start Questionnaire</button>
   </div>
@@ -222,6 +227,7 @@
     let currentQuestion = "";
     let selectedCategory = "";
     let selectedSubcategory = "";
+    let productName=""
    
     const subcategories = {
       food: ["Regenerative", "General"],
@@ -264,11 +270,13 @@
     document.getElementById("start-questionnaire").addEventListener("click", () => {
       selectedCategory = document.getElementById("category").value;
       selectedSubcategory = document.getElementById("subcategory").value;
-      
-      if (!selectedCategory || !selectedSubcategory) {
-        alert("Please select both a category and subcategory to continue.");
-        return;
+      productName = document.getElementById("product_name").value;
+
+      if (!selectedCategory || !selectedSubcategory || !productName.trim()) {
+      alert("Please select category, subcategory, and enter the product name to continue.");
+      return;
       }
+
       
       document.getElementById("category-screen").style.display = "none";
       document.getElementById("chat-box").style.display = "flex";
@@ -348,7 +356,8 @@
             body: JSON.stringify({ 
               session_id: sessionId,
               category: selectedCategory,
-              sub_categories: [selectedSubcategory]
+              sub_categories: [selectedSubcategory],
+              product_name:productName
             })
           };
         }
